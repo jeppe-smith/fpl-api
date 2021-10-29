@@ -1,4 +1,4 @@
-import "cross-fetch";
+import { fetch } from "cross-fetch";
 
 import { CookieJar } from "tough-cookie";
 
