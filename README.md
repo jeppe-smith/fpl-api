@@ -10,13 +10,9 @@ This can be used in the browser and with node.js.
 
 ## Usage
 
-Node
-
 `import FplApi from 'fpl-api'`
 
-Browser
-
-`import FplApi from 'fpl-api/web'`
+You can use fpl-api in the browser by using a module bundler like webpack, rollup, etc.
 
 ## Methods
 
