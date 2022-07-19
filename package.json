@@ -14,7 +14,7 @@
     "build:web": "webpack"
   },
   "main": "dist/node/index.js",
-  "types": "dist/web/index.d.ts",
+  "types": "dist/node/index.d.ts",
   "exports": {
     ".": "./dist/node/index.js",
     "./web": "./dist/web/index.js"
