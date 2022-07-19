@@ -1,4 +1,4 @@
-import { fetchPublicEndpoint } from "./fetchPublicEndpoint";
+import superagent from "superagent";
 import {
   Bootstrap,
   ClassicLeague,
@@ -14,28 +14,27 @@ import {
 } from "./types";
 
 /**
- * Fetch bootstrap data for the official web app.
- * @return Static bootstrap data.
+ * General data such as players, teams, gameweeks, etc.
  */
 export async function fetchBootstrap(): Promise<Bootstrap> {
-  const response = await fetchPublicEndpoint(
+  const response = await superagent.get(
     "https://fantasy.premierleague.com/api/bootstrap-static/"
   );
 
-  return await response.json();
+  return response.body;
 }
 
 /**
- * Fetch data for an element.
- * @param elementId ID of a player.
+ * Fetch data for a player.
+ * @param elementId player id.
  */
 export async function fetchElementSummary(
   elementId: number
 ): Promise<ElementSummary> {
-  const response = await fetchPublicEndpoint(
+  const response = await superagent.get(
     `https://fantasy.premierleague.com/api/element-summary/${elementId}/`
   );
-  let data = await response.json();
+  const data = response.body;
 
   data.id = elementId;
 
@@ -51,22 +50,22 @@ export async function fetchEntryEvent(
   entryId: number,
   eventId: number
 ): Promise<EntryEvent> {
-  const response = await fetchPublicEndpoint(
+  const response = await superagent.get(
     `https://fantasy.premierleague.com/api/entry/${entryId}/event/${eventId}/picks/`
   );
 
-  return await response.json();
+  return response.body;
 }
 
 /**
  * Fetch current event status.
  */
 export async function fetchEventStatus(): Promise<EventStatus> {
-  const response = await fetchPublicEndpoint(
-    "https://fantasy.premierleague.com/api/event-status"
+  const response = await superagent.get(
+    "https://fantasy.premierleague.com/api/event-status/"
   );
 
-  return await response.json();
+  return response.body;
 }
 
 /**
@@ -75,11 +74,12 @@ export async function fetchEventStatus(): Promise<EventStatus> {
  */
 export async function fetchFixtures(eventId?: number): Promise<Fixture[]> {
   const query = eventId !== undefined ? "?event=" + eventId : "";
-  const response = await fetchPublicEndpoint(
-    `https://fantasy.premierleague.com/api/fixtures${query}`
+
+  const response = await superagent.get(
+    `https://fantasy.premierleague.com/api/fixtures/${query}`
   );
 
-  return response.json();
+  return response.body;
 }
 
 /**
@@ -87,11 +87,11 @@ export async function fetchFixtures(eventId?: number): Promise<Fixture[]> {
  * @param eventId ID of a gameweek.
  */
 export async function fetchLive(eventId: number): Promise<Live> {
-  const response = await fetchPublicEndpoint(
+  const response = await superagent.get(
     `https://fantasy.premierleague.com/api/event/${eventId}/live/`
   );
 
-  return response.json();
+  return response.body;
 }
 
 /**
@@ -101,11 +101,11 @@ export async function fetchLive(eventId: number): Promise<Live> {
 export async function fetchEntryHistory(
   entryId: number
 ): Promise<EntryHistory> {
-  const response = await fetchPublicEndpoint(
+  const response = await superagent.get(
     `https://fantasy.premierleague.com/api/entry/${entryId}/history/`
   );
 
-  return response.json();
+  return response.body;
 }
 
 /**
@@ -113,11 +113,11 @@ export async function fetchEntryHistory(
  * @param entryId ID of an entry team.
  */
 export async function fetchEntry(entryId: number): Promise<Entry> {
-  const response = await fetchPublicEndpoint(
+  const response = await superagent.get(
     `https://fantasy.premierleague.com/api/entry/${entryId}/`
   );
 
-  return response.json();
+  return response.body;
 }
 
 /**
@@ -131,12 +131,11 @@ export async function fetchH2HMatches(
   entryId: number,
   page: number = 1
 ): Promise<H2HLeagueMatches> {
-  const response = await fetchPublicEndpoint(
-    // tslint:disable-next-line
+  const response = await superagent.get(
     `https://fantasy.premierleague.com/api/leagues-h2h-matches/league/${leagueId}/?page=${page}&entry=${entryId}`
   );
 
-  return await response.json();
+  return response.body;
 }
 
 /**
@@ -153,12 +152,11 @@ export async function fetchH2HLeagueStandings(
     pageNewEntries: 1,
   }
 ): Promise<H2HLeague> {
-  const response = await fetchPublicEndpoint(
-    // tslint:disable-next-line
+  const response = await superagent.get(
     `https://fantasy.premierleague.com/api/leagues-h2h/${leagueId}/standings/?page_new_entries=${pageNewEntries}&page_standings=${pageStandings}`
   );
 
-  return await response.json();
+  return response.body;
 }
 
 /**
@@ -177,10 +175,82 @@ export async function fetchClassicLeague(
     phase: 1,
   }
 ): Promise<ClassicLeague> {
-  const response = await fetchPublicEndpoint(
-    // tslint:disable-next-line
+  const response = await superagent.get(
     `https://fantasy.premierleague.com/api/leagues-classic/${leagueId}/standings/?page_new_entries=${pageNewEntries}&page_standings=${pageStandings}&phase=${phase}`
   );
 
-  return await response.json();
+  return response.body;
 }
+
+// /**
+//  * Fetch a session to use with protected endpoints.
+//  * @param email
+//  * @param password
+//  */
+// export async function fetchSession(email: string, password: string) {
+//   try {
+//     // const formData = new FormData();
+
+//     // formData.append("login", "jeppews@hotmail.com");
+//     // formData.append("password", "NT43GgCyM8Bmft4f");
+//     // formData.append("app", "plfpl-web");
+//     // formData.append("redirect_uri", "https://fantasy.premierleague.com/");
+
+//     const session = superagent.agent();
+
+//     session
+//       .set(
+//         "Accept",
+//         "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
+//       )
+//       .set("Host", "fantasy.premierleague.com")
+//       .set("Content-Type", "application/x-www-form-urlencoded")
+//       .set("Origin", "https://fantasy.premierleague.com")
+//       .set("Referer", "https://fantasy.premierleague.com/")
+//       .set(
+//         "User-Agent",
+//         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
+//       );
+
+//     await session.get("https://fantasy.premierleague.com/");
+
+//     const response = await session
+//       .post("https://users.premierleague.com/accounts/login/")
+//       // .set(
+//       //   "user-agent",
+//       //   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+//       // )
+//       // .set(
+//       //   "accept",
+//       //   "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+//       // )
+//       // .set("accept-language", "da-DK,da;q=0.9,en-DK;q=0.8,en;q=0.7,en-US;q=0.6")
+//       // .set("Host", "premierleague.com")
+//       .type("form")
+//       // .send(FormData);
+//       .send({
+//         login: "jeppews@hotmail.com",
+//         password: "NT43GgCyM8Bmft4f",
+//         app: "plfpl-web",
+//         redirect_uri: "https://fantasy.premierleague.com/",
+//       });
+
+//     console.log(response.status);
+
+//     return response;
+
+//     // response = await fetch("https://users.premierleague.com/accounts/login/", {
+//     //   credentials: "include",
+//     //   method: "POST",
+//     //   body: formData,
+//     // });
+
+//     // if (!response.ok) {
+//     //   throw new Error(response.statusText);
+//     // }
+
+//     // return true;
+//   } catch (error) {
+//     console.error(error);
+//   }
+// }

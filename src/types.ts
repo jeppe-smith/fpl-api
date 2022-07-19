@@ -35,6 +35,7 @@ export interface ElementTypes {
   squad_select: number;
   sub_positions_locked: number[];
   ui_shirt_specific: boolean;
+  element_count: number;
 }
 
 export interface Element {
@@ -45,31 +46,43 @@ export interface Element {
   chance_of_playing_this_round: number | null;
   clean_sheets: number;
   code: number;
-  cost_change_event: number;
+  corners_and_indirect_freekicks_order: number | null;
+  corners_and_indirect_freekicks_text: string;
   cost_change_event_fall: number;
-  cost_change_start: number;
+  cost_change_event: number;
   cost_change_start_fall: number;
+  cost_change_start: number;
   creativity: string;
+  creativity_rank_type: number | null;
+  creativity_rank: number | null;
+  direct_freekicks_order: number | null;
+  direct_freekicks_text: string;
   dreamteam_count: number;
   element_type: number;
-  ep_next: string;
-  ep_this: string;
+  ep_next: string | null;
+  ep_this: string | null;
   event_points: number;
   first_name: string;
   form: string;
   goals_conceded: number;
   goals_scored: number;
   ict_index: string;
+  ict_index_rank_type: number | null;
+  ict_index_rank: number | null;
   id: number;
   in_dreamteam: boolean;
   influence: string;
+  influence_rank_type: number | null;
+  influence_rank: number | null;
   minutes: number;
-  news: string;
   news_added: string | null;
+  news: string;
   now_cost: number;
   own_goals: number;
   penalties_missed: number;
+  penalties_order: number | null;
   penalties_saved: number;
+  penalties_text: string;
   photo: string;
   points_per_game: string;
   red_cards: number;
@@ -79,14 +92,16 @@ export interface Element {
   special: boolean;
   squad_number: number | null;
   status: ElementStatus;
-  team: number;
   team_code: number;
+  team: number;
   threat: string;
+  threat_rank_type: number | null;
+  threat_rank: number | null;
   total_points: number;
-  transfers_in: number;
   transfers_in_event: number;
-  transfers_out: number;
+  transfers_in: number;
   transfers_out_event: number;
+  transfers_out: number;
   value_form: string;
   value_season: string;
   web_name: string;
@@ -94,9 +109,12 @@ export interface Element {
 }
 
 interface EntryLeagueInfo {
-  id: 10;
+  id: number;
+  cup_league: null;
+  cup_qualified: boolean | null;
+  has_cup: boolean;
   name: string;
-  short_name: string;
+  short_name: string | null;
   created: string;
   closed: boolean;
   rank: null | number;
@@ -145,13 +163,14 @@ export interface CupMatch {
 }
 
 export interface EntryCupStatus {
-  qualification_event: number;
-  qualification_numbers: number;
-  qualification_rank: number;
-  qualification_state: "QUALIFIED" | "NOT_QUALIFIED_RANK";
+  qualification_event: number | null;
+  qualification_numbers: number | null;
+  qualification_rank: number | null;
+  qualification_state: "QUALIFIED" | "NOT_QUALIFIED_RANK" | null;
 }
 
 export interface EntryCup {
+  cup_league: null;
   matches: CupMatch[];
   status: EntryCupStatus;
 }
@@ -160,6 +179,7 @@ export interface EntryLeagues {
   classic: EntryClassicLeague[];
   h2h: EntryH2HLeague[];
   cup: EntryCup;
+  cup_matches: never[];
 }
 
 export interface Entry {
@@ -173,16 +193,17 @@ export interface Entry {
   player_region_name: string;
   player_region_iso_code_short: string;
   player_region_iso_code_long: string;
-  summary_overall_points: number;
-  summary_overall_rank: number;
-  summary_event_points: number;
-  summary_event_rank: number;
-  current_event: number;
+  summary_overall_points: number | null;
+  summary_overall_rank: number | null;
+  summary_event_points: number | null;
+  summary_event_rank: number | null;
+  current_event: number | null;
   leagues: EntryLeagues;
   name: string;
   kit: null | string;
-  last_deadline_bank: number;
-  last_deadline_value: number;
+  name_change_blocked: boolean;
+  last_deadline_bank: number | null;
+  last_deadline_value: number | null;
   last_deadline_total_transfers: number;
 }
 
@@ -224,10 +245,12 @@ export interface Event {
   top_element: number | null;
   top_element_info: TopElementInfo | null;
   transfers_made: number;
+  cup_leagues_created: boolean;
+  h2h_ko_matches_created: boolean;
 }
 
 export interface GameSettings {
-  cup_start_event_id: number;
+  cup_start_event_id: number | null;
   league_join_private_max: number;
   league_join_public_max: number;
   league_max_ko_rounds_private_h2h: number;
@@ -249,6 +272,12 @@ export interface GameSettings {
   ui_currency_multiplier: number;
   ui_special_shirt_exclusions: any[];
   ui_use_special_shirts: boolean;
+  league_h2h_tiebreak_stats: ["+goals_scored", "-goals_conceded"];
+  transfers_cap: number;
+  cup_qualifying_method: null;
+  cup_stop_event_id: number | null;
+  cup_type: null;
+  league_ko_first_instead_of_random: boolean;
 }
 
 export interface Phase {
@@ -268,6 +297,7 @@ export interface Team {
   played: number;
   points: number;
   position: number;
+  pulse_id: number;
   short_name: string;
   strength: number;
   strength_attack_away: number;
@@ -342,6 +372,7 @@ export interface ElementSummaryUpcomingFixture {
   event: number;
   event_name: string;
   finished: boolean;
+  id: number;
   is_home: boolean;
   kickoff_time: string;
   minutes: number;
@@ -438,6 +469,7 @@ export interface Fixture {
   kickoff_time: string;
   minutes: number;
   provisional_start_time: boolean;
+  pulse_id: number;
   started: boolean;
   team_a: number;
   team_a_score: number | null;

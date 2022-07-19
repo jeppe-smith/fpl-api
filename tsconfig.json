@@ -6,10 +6,8 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "lib": ["es2015", "DOM"],
-    "rootDir": "src",
     "esModuleInterop": true,
-    "outDir": "dist"
+    "outDir": "dist/node"
   },
-  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
