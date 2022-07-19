@@ -10,7 +10,7 @@ import {
   fetchEventStatus,
   fetchFixtures,
   fetchLive,
-} from "fpl-api";
+} from "../src";
 
 const validator = new Validator();
 const schema = JSON.parse(
