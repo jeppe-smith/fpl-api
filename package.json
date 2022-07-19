@@ -21,7 +21,7 @@
   },
   "typesVersions": {
     "*": {
-      "node": [
+      "web": [
         "dist/node/index.d.ts"
       ]
     }
