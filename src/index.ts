@@ -4,7 +4,13 @@ export type ElementStatus = "a" | "u" | "i" | "s" | "n" | "d";
 
 export type ChipName = "bboost" | "3xc" | "freehit" | "wildcard";
 
-export type LeagueType = "x" | "s";
+export type ChipType = "transfer" | "team";
+
+/**
+ * "s" = system league, "x" = user created league, "c" = auto created league
+ * (the ones named "League <id>").
+ */
+export type LeagueType = "x" | "s" | "c";
 
 export type StatIdentifier =
   | "minutes"
@@ -19,11 +25,24 @@ export type StatIdentifier =
   | "red_cards"
   | "saves"
   | "bonus"
-  | "bps";
+  | "bps"
+  | "influence"
+  | "creativity"
+  | "threat"
+  | "ict_index"
+  | "clearances_blocks_interceptions"
+  | "recoveries"
+  | "tackles"
+  | "defensive_contribution"
+  | "starts"
+  | "expected_goals"
+  | "expected_assists"
+  | "expected_goal_involvements"
+  | "expected_goals_conceded";
 
 export interface ElementStats {
   label: string;
-  name: string;
+  name: StatIdentifier;
 }
 
 export interface ElementTypes {
@@ -35,18 +54,38 @@ export interface ElementTypes {
   squad_max_play: number;
   squad_min_play: number;
   squad_select: number;
+  squad_max_select: number | null;
+  squad_min_select: number | null;
   sub_positions_locked: number[];
   ui_shirt_specific: boolean;
   element_count: number;
 }
 
+export interface ElementPriceChangeProjection {
+  offset: number;
+  projected_percent: string;
+  likelihood: number;
+}
+
+export interface ElementScoutRisk {
+  property: string;
+  notes: string;
+  gameweek: number;
+  url: string | null;
+}
+
 export interface Element {
   assists: number;
+  birth_date: string | null;
   bonus: number;
   bps: number;
+  can_select: boolean;
+  can_transact: boolean;
   chance_of_playing_next_round: number | null;
   chance_of_playing_this_round: number | null;
+  clean_sheets_per_90: number;
   clean_sheets: number;
+  clearances_blocks_interceptions: number;
   code: number;
   corners_and_indirect_freekicks_order: number | null;
   corners_and_indirect_freekicks_text: string;
@@ -57,6 +96,8 @@ export interface Element {
   creativity: string;
   creativity_rank_type: number | null;
   creativity_rank: number | null;
+  defensive_contribution_per_90: number;
+  defensive_contribution: number;
   direct_freekicks_order: number | null;
   direct_freekicks_text: string;
   dreamteam_count: number;
@@ -64,10 +105,22 @@ export interface Element {
   ep_next: string | null;
   ep_this: string | null;
   event_points: number;
+  expected_assists_per_90: number;
+  expected_assists: string;
+  expected_goal_involvements_per_90: number;
+  expected_goal_involvements: string;
+  expected_goals_conceded_per_90: number;
+  expected_goals_conceded: string;
+  expected_goals_per_90: number;
+  expected_goals: string;
   first_name: string;
   form: string;
+  form_rank_type: number;
+  form_rank: number;
+  goals_conceded_per_90: number;
   goals_conceded: number;
   goals_scored: number;
+  has_temporary_code: boolean;
   ict_index: string;
   ict_index_rank_type: number | null;
   ict_index_rank: number | null;
@@ -76,25 +129,48 @@ export interface Element {
   influence: string;
   influence_rank_type: number | null;
   influence_rank: number | null;
+  known_name: string;
   minutes: number;
   news_added: string | null;
   news: string;
+  now_cost_rank_type: number;
+  now_cost_rank: number;
   now_cost: number;
+  opta_code: string;
   own_goals: number;
   penalties_missed: number;
   penalties_order: number | null;
   penalties_saved: number;
   penalties_text: string;
   photo: string;
+  points_per_game_rank_type: number;
+  points_per_game_rank: number;
   points_per_game: string;
+  price_change_calibrating: boolean;
+  price_change_hourly_rate: number;
+  price_change_locked_until: string | null;
+  price_change_percent: string;
+  price_change_projections: ElementPriceChangeProjection[];
+  recoveries: number;
   red_cards: number;
+  region: number | null;
+  removed: boolean;
+  saves_per_90: number;
   saves: number;
+  scout_news_link: string;
+  scout_risks: ElementScoutRisk[];
   second_name: string;
   selected_by_percent: string;
+  selected_rank_type: number;
+  selected_rank: number;
   special: boolean;
   squad_number: number | null;
+  starts_per_90: number;
+  starts: number;
   status: ElementStatus;
+  tackles: number;
   team_code: number;
+  team_join_date: string | null;
   team: number;
   threat: string;
   threat_rank_type: number | null;
@@ -110,6 +186,17 @@ export interface Element {
   yellow_cards: number;
 }
 
+export interface EntryLeaguePhase {
+  phase: number;
+  rank: number;
+  last_rank: number;
+  rank_sort: number;
+  total: number;
+  league_id: number;
+  rank_count: number | null;
+  entry_percentile_rank: number | null;
+}
+
 interface EntryLeagueInfo {
   id: number;
   cup_league: null;
@@ -120,12 +207,16 @@ interface EntryLeagueInfo {
   created: string;
   closed: boolean;
   rank: null | number;
+  rank_count: null | number;
+  entry_percentile_rank: null | number;
+  active_phases: EntryLeaguePhase[];
+  featured_entry_ids: number[];
   max_entries: null | number;
   league_type: LeagueType;
   admin_entry: null | number;
   start_event: number;
-  entry_rank: number;
-  entry_last_rank: number;
+  entry_rank: number | null;
+  entry_last_rank: number | null;
   entry_can_leave: boolean;
   entry_can_admin: boolean;
   entry_can_invite: boolean;
@@ -182,19 +273,21 @@ export interface EntryLeagues {
   h2h: EntryH2HLeague[];
   cup: EntryCup;
   cup_matches: never[];
+  event: never[];
 }
 
 export interface Entry {
   id: number;
   joined_time: string;
   started_event: number;
-  favourite_team: number;
+  favourite_team: number | null;
   player_first_name: string;
   player_last_name: string;
   player_region_id: number;
   player_region_name: string;
   player_region_iso_code_short: string;
   player_region_iso_code_long: string;
+  years_active: number;
   summary_overall_points: number | null;
   summary_overall_rank: number | null;
   summary_event_points: number | null;
@@ -204,6 +297,8 @@ export interface Entry {
   name: string;
   kit: null | string;
   name_change_blocked: boolean;
+  entered_events: number[];
+  club_badge_src: string | null;
   last_deadline_bank: number | null;
   last_deadline_value: number | null;
   last_deadline_total_transfers: number;
@@ -225,8 +320,21 @@ export interface TopElementInfo {
   points: number;
 }
 
+/**
+ * Per gameweek/chip adjustments to the rules and scoring. All observed values
+ * are empty, so the rule and scoring overrides are modelled as partials.
+ */
+export interface Overrides {
+  rules: Partial<GameConfigRules>;
+  scoring: Partial<GameConfigScoring>;
+  element_types: any[];
+  pick_multiplier: number | null;
+}
+
 export interface Event {
   average_entry_score: number;
+  can_enter: boolean;
+  can_manage: boolean;
   chip_plays: EventChipPlay[];
   data_checked: boolean;
   deadline_time: string;
@@ -244,6 +352,10 @@ export interface Event {
   most_transferred_in: number | null;
   most_vice_captained: number | null;
   name: string;
+  overrides: Overrides;
+  ranked_count: number;
+  release_time: string | null;
+  released: boolean;
   top_element: number | null;
   top_element_info: TopElementInfo | null;
   transfers_made: number;
@@ -251,8 +363,20 @@ export interface Event {
   h2h_ko_matches_created: boolean;
 }
 
+export interface Chip {
+  id: number;
+  name: ChipName;
+  number: number;
+  start_event: number;
+  stop_event: number;
+  chip_type: ChipType;
+  overrides: Overrides;
+}
+
 export interface GameSettings {
   cup_start_event_id: number | null;
+  element_sell_at_purchase_price: boolean;
+  featured_entries: any[];
   league_join_private_max: number;
   league_join_public_max: number;
   league_max_ko_rounds_private_h2h: number;
@@ -263,6 +387,10 @@ export interface GameSettings {
   league_points_h2h_lose: number;
   league_points_h2h_win: number;
   league_prefix_public: string;
+  max_extra_free_transfers: number;
+  percentile_ranks: number[];
+  squad_special_max: number | null;
+  squad_special_min: number | null;
   squad_squadplay: number;
   squad_squadsize: number;
   squad_team_limit: number;
@@ -274,6 +402,7 @@ export interface GameSettings {
   ui_currency_multiplier: number;
   ui_special_shirt_exclusions: any[];
   ui_use_special_shirts: boolean;
+  underdog_differential: number;
   league_h2h_tiebreak_stats: ["+goals_scored", "-goals_conceded"];
   transfers_cap: number;
   cup_qualifying_method: null;
@@ -282,11 +411,79 @@ export interface GameSettings {
   league_ko_first_instead_of_random: boolean;
 }
 
+export interface GameConfigSettings {
+  entry_per_event: boolean;
+  timezone: string;
+  static_content_url: string;
+  price_change_deadlines: string[];
+}
+
+/**
+ * Same as `GameSettings` minus `timezone`, which lives on
+ * `GameConfig["settings"]` instead.
+ */
+export type GameConfigRules = Omit<GameSettings, "timezone">;
+
+/**
+ * Points awarded per element type (position).
+ */
+export interface ElementTypeScoring {
+  GKP: number;
+  DEF: number;
+  MID: number;
+  FWD: number;
+}
+
+export interface GameConfigScoring {
+  long_play: number;
+  short_play: number;
+  goals_conceded: ElementTypeScoring;
+  saves: number;
+  goals_scored: ElementTypeScoring;
+  assists: number;
+  clean_sheets: ElementTypeScoring;
+  penalties_saved: number;
+  penalties_missed: number;
+  yellow_cards: number;
+  red_cards: number;
+  own_goals: number;
+  bonus: number;
+  bps: number;
+  influence: number;
+  creativity: number;
+  threat: number;
+  ict_index: number;
+  special_multiplier: number;
+  tackles: number;
+  clearances_blocks_interceptions: number;
+  recoveries: number;
+  defensive_contribution: ElementTypeScoring;
+  starts: number;
+  mng_goals_scored: ElementTypeScoring;
+  mng_clean_sheets: ElementTypeScoring;
+  mng_win: ElementTypeScoring;
+  mng_draw: ElementTypeScoring;
+  mng_loss: number;
+  mng_underdog_win: ElementTypeScoring;
+  mng_underdog_draw: ElementTypeScoring;
+  expected_goals: number;
+  expected_assists: number;
+  expected_goal_involvements: number;
+  expected_goals_conceded: number;
+}
+
+export interface GameConfig {
+  settings: GameConfigSettings;
+  rules: GameConfigRules;
+  scoring: GameConfigScoring;
+}
+
 export interface Phase {
   id: number;
   name: string;
   start_event: number;
   stop_event: number;
+  highest_score: number | null;
 }
 
 export interface Team {
@@ -294,6 +491,7 @@ export interface Team {
   draw: number;
   form: string | null;
   id: number;
+  link_url: string;
   loss: number;
   name: string;
   played: number;
@@ -301,7 +499,7 @@ export interface Team {
   position: number;
   pulse_id: number;
   short_name: string;
-  strength: number;
+  strength: number | null;
   strength_attack_away: number;
   strength_attack_home: number;
   strength_defence_away: number;
@@ -314,10 +512,12 @@ export interface Team {
 }
 
 export interface Bootstrap {
+  chips: Chip[];
   element_stats: ElementStats[];
   element_types: ElementTypes[];
   elements: Element[];
   events: Event[];
+  game_config: GameConfig;
   game_settings: GameSettings;
   phases: Phase[];
   teams: Team[];
@@ -342,14 +542,25 @@ export interface LiveElementStats {
   creativity: string;
   threat: string;
   ict_index: string;
+  clearances_blocks_interceptions: number;
+  recoveries: number;
+  tackles: number;
+  defensive_contribution: number;
+  starts: number;
+  expected_goals: string;
+  expected_assists: string;
+  expected_goal_involvements: string;
+  expected_goals_conceded: string;
   total_points: number;
   in_dreamteam: boolean;
+  played: boolean;
 }
 
 export interface LiveElementExplainStat {
   [key: string]: any;
   identifier: StatIdentifier;
   points: number;
+  points_modification: number;
   value: number;
 }
 
@@ -360,6 +571,7 @@ export interface LiveElementExplain {
 
 export interface LiveElement {
   id: number;
+  modified: boolean;
   stats: LiveElementStats;
   explain: LiveElementExplain[];
 }
@@ -390,8 +602,14 @@ export interface ElementSummaryFixture {
   bonus: number;
   bps: number;
   clean_sheets: number;
+  clearances_blocks_interceptions: number;
   creativity: string;
+  defensive_contribution: number;
   element: number;
+  expected_assists: string;
+  expected_goal_involvements: string;
+  expected_goals_conceded: string;
+  expected_goals: string;
   fixture: number;
   goals_conceded: number;
   goals_scored: number;
@@ -399,14 +617,18 @@ export interface ElementSummaryFixture {
   influence: string;
   kickoff_time: string;
   minutes: number;
+  modified: boolean;
   opponent_team: number;
   own_goals: number;
   penalties_missed: number;
   penalties_saved: number;
+  recoveries: number;
   red_cards: number;
   round: number;
   saves: number;
   selected: number;
+  starts: number;
+  tackles: number;
   team_a_score: number;
   team_h_score: number;
   threat: string;
@@ -424,9 +646,15 @@ export interface ElementSummarySeason {
   bonus: number;
   bps: number;
   clean_sheets: number;
+  clearances_blocks_interceptions: number;
   creativity: string;
+  defensive_contribution: number;
   element_code: number;
   end_cost: number;
+  expected_assists: string;
+  expected_goal_involvements: string;
+  expected_goals_conceded: string;
+  expected_goals: string;
   goals_conceded: number;
   goals_scored: number;
   ict_index: string;
@@ -435,10 +663,13 @@ export interface ElementSummarySeason {
   own_goals: number;
   penalties_missed: number;
   penalties_saved: number;
+  recoveries: number;
   red_cards: number;
   saves: number;
   season_name: string;
   start_cost: number;
+  starts: number;
+  tackles: number;
   threat: string;
   total_points: number;
   yellow_cards: number;
@@ -502,6 +733,7 @@ export interface EventStatus {
 
 export interface EntrySeasonHistory {
   rank: number;
+  rank_percentage: string;
   season_name: string;
   total_points: number;
 }
@@ -518,6 +750,8 @@ export interface EntryEventHistory {
   event_transfers: number;
   event_transfers_cost: number;
   overall_rank: number;
+  overall_rank_percentage: string;
+  percentile_rank: number;
   points: number;
   points_on_bench: number;
   rank: number;
@@ -528,15 +762,23 @@ export interface EntryEventHistory {
 
 export interface EntryEventPick {
   element: number;
+  element_type: number;
   is_captain: boolean;
   is_vice_captain: boolean;
   multiplier: number;
   position: number;
 }
 
+export interface EntryEventAutomaticSub {
+  entry: number;
+  element_in: number;
+  element_out: number;
+  event: number;
+}
+
 export interface EntryEvent {
   active_chip: ChipName | null;
-  automatic_subs: any[];
+  automatic_subs: EntryEventAutomaticSub[];
   entry_history: EntryEventHistory;
   picks: EntryEventPick[];
 }
@@ -575,7 +817,7 @@ export interface MyTeamChip {
   number: number;
   start_event: number;
   stop_event: number;
-  chip_type: "transfer" | "team";
+  chip_type: ChipType;
 }
 
 export interface MyTeamTransfers {
@@ -594,18 +836,21 @@ export interface MyTeam {
 }
 
 export interface ClassicLeague {
+  last_updated_data: string | null;
   league: ClassicLeagueInfo;
-  new_entries: NewLeagueEntry[];
+  new_entries: NewLeagueEntries;
   standings: ClassicLeagueStandings;
 }
 
 export interface ClassicLeagueInfo extends LeagueInfo {
   scoring: "c";
+  rank: null;
 }
 
 export interface H2HLeague {
+  last_updated_data: string | null;
   league: H2HLeagueInfo;
-  new_entries: NewLeagueEntry[];
+  new_entries: NewLeagueEntries;
   standings: H2HLeagueStandings;
 }
 
@@ -619,11 +864,12 @@ interface LeagueInfo {
   closed: boolean;
   code_privacy: "p";
   created: string;
+  cup_league: null;
+  has_cup: boolean;
   id: number;
   league_type: LeagueType;
   max_entries: number | null;
   name: string;
-  rank: null;
   start_event: number;
 }
 
@@ -635,10 +881,15 @@ export interface NewLeagueEntry {
   player_last_name: string;
 }
 
+export interface NewLeagueEntries {
+  has_next: boolean;
+  page: number;
+  results: NewLeagueEntry[];
+}
+
 interface LeagueEntry {
   entry: number;
   entry_name: string;
-  id: number;
   last_rank: number;
   player_name: string;
   rank: number;
@@ -647,16 +898,26 @@ interface LeagueEntry {
 }
 
 export interface ClassicLeagueEntry extends LeagueEntry {
+  club_badge_src: string | null;
   event_total: number;
+  /**
+   * Only present when standings are requested for a phase other than 1.
+   */
+  id?: number;
+  /**
+   * Only present when standings are requested for a phase other than 1.
+   */
+  has_played?: boolean;
 }
 
 export interface H2HLeagueEntry extends LeagueEntry {
-  division: 182514;
-  matches_drawn: 0;
-  matches_lost: 5;
-  matches_played: 16;
-  matches_won: 11;
-  points_for: 872;
+  id: number;
+  division: number;
+  matches_drawn: number;
+  matches_lost: number;
+  matches_played: number;
+  matches_won: number;
+  points_for: number;
 }
 
 interface LeagueStandings {
@@ -691,7 +952,10 @@ export interface H2HMatch {
   entry_2_win: number;
   event: number;
   id: number;
+  is_bye: boolean;
   is_knockout: boolean;
+  knockout_name: string;
+  league: number;
   seed_value: null;
   tiebreak: null;
   winner: null;
