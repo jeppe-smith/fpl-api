@@ -9,10 +9,15 @@
   "scripts": {
     "test": "jest",
     "make:schema": "npx ts-json-schema-generator --path src/types.ts --out schema.json",
-    "build": "tsc --project tsconfig.build.json"
+    "build": "tsc --project tsconfig.build.json",
+    "prepublishOnly": "npm run build"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "devDependencies": {
     "@types/jest": "^28.1.6",
     "@types/superagent": "^4.1.15",
